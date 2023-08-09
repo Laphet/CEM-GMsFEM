@@ -7,7 +7,7 @@ COARSE3 = 40
 COARSE4 = 80
 N_V = 4
 
-QUAD_ORDER = 5
+QUAD_ORDER = 2
 QUAD_CORD, QUAD_WGHT = np.polynomial.legendre.leggauss(QUAD_ORDER)
 
 
@@ -49,11 +49,16 @@ def get_loc_stiff(loc_coeff: float, loc_ind_i: int, loc_ind_j: int):
     val = 0.0
     for quad_ind_x in range(QUAD_ORDER):
         for quad_ind_y in range(QUAD_ORDER):
-            quad_cord_x, quad_cord_y = QUAD_CORD[quad_ind_x], QUAD_CORD[quad_ind_y]
-            quad_wght_x, quad_wght_y = QUAD_WGHT[quad_ind_x], QUAD_WGHT[quad_ind_y]
-            grad_val_ix, grad_val_iy = get_locbase_grad_val(loc_ind_i, quad_cord_x, quad_cord_y)
-            grad_val_jx, grad_val_jy = get_locbase_grad_val(loc_ind_j, quad_cord_x, quad_cord_y)
-            val += loc_coeff * (grad_val_ix * grad_val_jx + grad_val_iy * grad_val_jy) * quad_wght_x * quad_wght_y
+            quad_cord_x, quad_cord_y = QUAD_CORD[quad_ind_x], QUAD_CORD[
+                quad_ind_y]
+            quad_wght_x, quad_wght_y = QUAD_WGHT[quad_ind_x], QUAD_WGHT[
+                quad_ind_y]
+            grad_val_ix, grad_val_iy = get_locbase_grad_val(
+                loc_ind_i, quad_cord_x, quad_cord_y)
+            grad_val_jx, grad_val_jy = get_locbase_grad_val(
+                loc_ind_j, quad_cord_x, quad_cord_y)
+            val += loc_coeff * (grad_val_ix * grad_val_jx + grad_val_iy *
+                                grad_val_jy) * quad_wght_x * quad_wght_y
     return val
 
 
@@ -61,8 +66,10 @@ def get_loc_mass(h: float, loc_kappa: float, loc_ind_i: int, loc_ind_j: int):
     val = 0.0
     for quad_ind_x in range(QUAD_ORDER):
         for quad_ind_y in range(QUAD_ORDER):
-            quad_cord_x, quad_cord_y = QUAD_CORD[quad_ind_x], QUAD_CORD[quad_ind_y]
-            quad_wght_x, quad_wght_y = QUAD_WGHT[quad_ind_x], QUAD_WGHT[quad_ind_y]
+            quad_cord_x, quad_cord_y = QUAD_CORD[quad_ind_x], QUAD_CORD[
+                quad_ind_y]
+            quad_wght_x, quad_wght_y = QUAD_WGHT[quad_ind_x], QUAD_WGHT[
+                quad_ind_y]
             val_i = get_locbase_val(loc_ind_i, quad_cord_x, quad_cord_y)
             val_j = get_locbase_val(loc_ind_j, quad_cord_x, quad_cord_y)
             val += 0.25 * h**2 * loc_kappa * val_i * val_j * quad_wght_x * quad_wght_y
@@ -70,6 +77,7 @@ def get_loc_mass(h: float, loc_kappa: float, loc_ind_i: int, loc_ind_j: int):
 
 
 class Setting:
+
     def upd(self, option: int = 1):
         self.coarse_grid = 0
         if option == 1:
@@ -118,8 +126,10 @@ class Setting:
         self.elem_Bi_mass_mat = np.zeros((N_V, N_V))
         for loc_ind_i in range(N_V):
             for loc_ind_j in range(N_V):
-                self.elem_Lap_stiff_mat[loc_ind_i, loc_ind_j] = get_loc_stiff(1.0, loc_ind_i, loc_ind_j)
-                self.elem_Bi_mass_mat[loc_ind_i, loc_ind_j] = get_loc_mass(self.h, 1.0, loc_ind_i, loc_ind_j)
+                self.elem_Lap_stiff_mat[loc_ind_i, loc_ind_j] = get_loc_stiff(
+                    1.0, loc_ind_i, loc_ind_j)
+                self.elem_Bi_mass_mat[loc_ind_i, loc_ind_j] = get_loc_mass(
+                    self.h, 1.0, loc_ind_i, loc_ind_j)
 
     def __init__(self, option: int = 1):
         self.upd(option)
